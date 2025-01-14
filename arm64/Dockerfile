@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ubuntu:arm64v8
 
 # Copier le fichier cowsay dans le conteneur
 COPY bin/cowsay /usr/local/bin/cowsay
