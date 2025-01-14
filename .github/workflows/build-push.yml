@@ -86,7 +86,7 @@ jobs:
           docker rm cowsay || true
           chmod +x ./bin/cowsay
           nohup ./bin/cowsay &
-          sudo docker run  --name cowsay3 -p 8080:8080 kareemdev2/cowsaygo
+          docker run  --name cowsay3 -p 8080:8080 kareemdev2/cowsaygo
 
           
 
