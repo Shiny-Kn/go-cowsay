@@ -1,5 +1,5 @@
-<<<<<<< HEAD
 ---
+
 name: Build GO & Docker push
     
 on:
