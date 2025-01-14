@@ -67,23 +67,23 @@ jobs:
         path: bin/cowsay
 
 # Deploy job
-deploy:
-  runs-on: self-hosted  # Utiliser un runner auto-hébergé
+  deploy:
+    runs-on: self-hosted  # Utiliser un runner auto-hébergé
 
-  needs: build  # Le déploiement dépend du succès de l'étape build
+    needs: build  # Le déploiement dépend du succès de l'étape build
 
-  steps:
-  - name: Download binary artifact
+    steps:
+    - name: Download binary artifact
       uses: actions/download-artifact@v3
       with:
         name: cowsay-binary
         path: ./bin
 
-  - name: Deploy application on server
-    run: |
-      docker stop cowsay || true
-      docker rm cowsay || true
-      docker run -d --name cowsay -p 8080:8080 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+    - name: Deploy application on server
+      run: |
+        docker stop cowsay || true
+        docker rm cowsay || true
+        docker run -d --name cowsay -p 8080:8080 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
-      chmod +x ./bin/cowsay
+        chmod +x ./bin/cowsay
       
