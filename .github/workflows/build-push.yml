@@ -23,6 +23,7 @@ jobs:
           Dockerfile
           main.go
           go.sum
+
     - name: Docker meta
       id: meta
       uses: docker/metadata-action@v5
@@ -87,3 +88,12 @@ jobs:
 
         chmod +x ./bin/cowsay
         nohup ./bin/cowsay &
+
+    - name: Build and push
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
