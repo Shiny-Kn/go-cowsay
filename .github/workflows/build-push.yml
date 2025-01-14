@@ -18,12 +18,11 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-      with: kareemdev2/cowsaygo:v2.03
+      with:
         sparse-checkout: |
           Dockerfile
           main.go
           go.sum
-
     - name: Docker meta
       id: meta
       uses: docker/metadata-action@v5
@@ -60,4 +59,3 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-
