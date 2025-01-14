@@ -86,4 +86,4 @@ jobs:
         docker run -d --name cowsay -p 8080:8080 ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
         chmod +x ./bin/cowsay
-      
+        nohup ./bin/cowsay &
