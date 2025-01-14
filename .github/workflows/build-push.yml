@@ -82,11 +82,9 @@ jobs:
 
     - name: Deploy application on server
       run: |
-        docker stop cowsay || true
-        docker rm cowsay || true
-        
-
-        chmod +x ./bin/cowsay
-        nohup ./bin/cowsay &
+          docker stop cowsay || true
+          docker rm cowsay || true
+          chmod +x ./bin/cowsay
+          
 
  
