@@ -8,7 +8,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: bilalis/cowsay-go
+  IMAGE_NAME: battaba/cowsay-go
 
 jobs:
   # Build job
@@ -18,7 +18,7 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-      with: bilalis/cowsay-go:v1.03
+      with:
         sparse-checkout: |
           Dockerfile
           main.go
@@ -48,8 +48,8 @@ jobs:
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
-        username: ${{ vars.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.BILALIS }}
+        username: ${{ vars.DOCKERHUB_USERNAME_BATTA }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     - name: Build and push
       uses: docker/build-push-action@v6
