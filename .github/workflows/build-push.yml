@@ -2,7 +2,7 @@
 name: Build GO & Docker push
     
 on:
-  workflow_dispatch: # il va se 
+  workflow_dispatch: # il va se declencher avec un nouveau tag 
   push:
     tags: 'v*'
 
@@ -30,6 +30,16 @@ jobs:
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
+    # ajout 
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+      with:
+        platforms: all 
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    # fin de l'ajout
+
     - name: Build the cowsay
       uses: actions/setup-go@v5
       with:
@@ -37,16 +47,17 @@ jobs:
         check-latest: true
     - run: go build -o bin/cowsay main.go
 
-    - name: Login to Docker Hub
+    - name: Login to Docker Hub # notre connexion à docker hub.
       uses: docker/login-action@v3
       with:
-        username: ${{ vars.DOCKERHUB_USERNAME_HERMOELLE }}
+        username: ${{ vars.DOCKERHUB_USERNAME_HERMOELLE }} # on lui dit de recuperer la valeur de la variable DOCKERHUB_USERNAME_HERMOELLE
         password: ${{ secrets.MY_TOKEN }}
 
     - name: Build and push
       uses: docker/build-push-action@v6
       with:
         context: .
+        platforms: linux/amd64,linux/arm64
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
