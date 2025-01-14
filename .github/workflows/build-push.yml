@@ -30,6 +30,8 @@ jobs:
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
+    
+
     - name: Build the cowsay
       uses: actions/setup-go@v5
       with:
@@ -47,6 +49,7 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         context: .
+        plateforms: linux/amd64, linux/arm64
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
