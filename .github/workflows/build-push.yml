@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ---
 name: Build GO & Docker push
     
@@ -5,13 +6,10 @@ on:
   workflow_dispatch:
   push:
     tags: 'v*'
-    
-  schedule:
-    - cron: '0 0 * * *' # Chaque nuit à minuit
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: sarradocker1/cowsay-go
+  IMAGE_NAME: sarradocker1/cowsaygo
 
 jobs:
   # Build job
@@ -32,6 +30,7 @@ jobs:
       uses: docker/metadata-action@v5
       with:
         images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
       with:
@@ -39,6 +38,8 @@ jobs:
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
+    
+
     - name: Build the cowsay
       uses: actions/setup-go@v5
       with:
@@ -60,7 +61,8 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-        - name: Save binary as artifact
+
+    - name: Save binary as artifact
       uses: actions/upload-artifact@v3
       with:
         name: cowsay-binary
@@ -85,3 +87,4 @@ jobs:
           docker rm cowsay || true
           chmod +x ./bin/cowsay
           nohup ./bin/cowsay &
+          
