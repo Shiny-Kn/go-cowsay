@@ -18,7 +18,7 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-      with: bilalis/cowsay-go:v1.03
+      with:
         sparse-checkout: |
           Dockerfile
           main.go
