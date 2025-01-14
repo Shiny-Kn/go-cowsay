@@ -5,6 +5,9 @@ on:
   workflow_dispatch:
   push:
     tags: 'v*'
+    
+  schedule:
+    - cron: '0 0 * * *' # Chaque nuit à minuit
 
 env:
   REGISTRY: docker.io
