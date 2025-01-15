@@ -15,7 +15,7 @@
       IMAGE_NAME: ${{ vars.DOCKERHUB_USERNAME_KARIM }}/cowsay-go
     
     jobs:
-      # Build job
+      # Build job2
       build:
         runs-on: ubuntu-latest
     
