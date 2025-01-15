@@ -3,9 +3,6 @@ name: Build GO & Docker push
     
 on:
   workflow_dispatch:
-  push:
-    tags: 'v*'
-
   workflow_run:
     workflows: ["Build GO & Docker deploy"]
     types: [completed]
