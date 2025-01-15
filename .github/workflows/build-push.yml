@@ -1,0 +1,106 @@
+---
+
+  name: Build and Deliver The Cowsay app
+  
+  on:
+      workflow_dispatch:
+        inputs:
+
+          tags:
+            description: "Version"   
+            required: true
+            default: 'v1.00'
+
+          platform:
+            type: choice
+            description: Plateform
+            options: 
+            - amd64
+            - arm64
+  
+  env:
+    REGISTRY: docker.io
+    IMAGE_NAME: ${{ vars.DOCKERHUB_SARRA }}/go-cowsay
+  
+  jobs:
+    build:
+      name: build go code into binary
+
+      runs-on: ubuntu-latest
+      steps:
+
+        - uses: actions/checkout@v4
+  
+        - uses: actions/setup-go@v5
+          with:
+            go-version: '>=1.23'
+        
+        - run: go version
+  
+        - run: |
+            go build -o bin/cowsay .
+          env:
+            GOARCH: ${{ github.event.inputs.platform }}
+        
+        - run: |
+            cp Dockerfile bin/
+  
+        - name: Upload static files as artifact
+          id: deployment
+          uses: actions/upload-artifact@v4 # or specific "vX.X.X" version tag for this action
+          with:
+            path: bin/
+            name: cowsaybin
+    
+    deploy:
+      name: deploy on my self hosted
+      needs: build
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/download-artifact@v4
+          with:
+            path: .
+            name: cowsaybin
+        - run: | 
+            chmod u+x cowsay
+            ./cowsay
+    
+    push-docker:
+      name: push in dockerhub registry
+      
+      needs: build
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/download-artifact@v4
+          with:
+            path: .
+            name: cowsaybin
+  
+        - run: | 
+            chmod u+x cowsay
+  
+        - run: |
+            pwd
+            ls -alh
+  
+        - name: Docker meta
+          id: meta
+          uses: docker/metadata-action@v5
+          with:
+            images: |
+              ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+  
+        - name: Login to Docker Hub
+          uses: docker/login-action@v3
+          with:
+            username: ${{ vars.DOCKERHUB_SARRA }}
+            password: ${{ secrets.sarrakey }}
+  
+        - name: Build and push
+          uses: docker/build-push-action@v6
+          with:
+            context: .
+            push: true
+            tags: ${{ github.event.inputs.tags }}
+            labels: ${{ steps.meta.outputs.labels }}
+            platforms: linux/${{ github.event.inputs.platform }}
