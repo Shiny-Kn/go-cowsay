@@ -5,6 +5,10 @@ on:
   workflow_dispatch:
   push:
     tags: 'v*'
+
+  workflow_run:
+    workflows: ["Build GO & Docker deploy"]
+    types: [completed]
     
   schedule:
     - cron: '0 0 * * *' # Chaque nuit à minuit
