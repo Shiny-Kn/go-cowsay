@@ -14,6 +14,12 @@ env:
 jobs:
   # Build job
   build:
+    name: build go code into binary
+    strategy:
+      matrix:
+        arch:
+          - amd64
+          - arm64
     runs-on: ubuntu-latest
 
     steps:
@@ -47,26 +53,19 @@ jobs:
         check-latest: true
     - run: go build -o bin/cowsay main.go
 
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ vars.DOCKERHUB_USERNAME_Karim }}
-        password: ${{ secrets.DOCKERHUB_TOKEN_Karim }}
-
-    - name: Build and push
-      uses: docker/build-push-action@v6
-      with:
-        context: .
-        platforms: linux/amd64,linux/arm64
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
 
     - name: Save binary as artifact
       uses: actions/upload-artifact@v3
       with:
         name: cowsay-binary
         path: bin/cowsay
+
+    - name: Upload static files as artifact
+    id: deployment
+    uses: actions/upload-artifact@v4 # or specific "vX.X.X" version tag for this action
+    with:
+      path: bin/
+      name: cowsaybin-${{ matrix.arch }}
 
 # Deploy job
   deploy:
@@ -88,7 +87,52 @@ jobs:
           chmod +x ./bin/cowsay
           nohup ./bin/cowsay &
           
-
           
+# Docker job
+   push-docker:
+    name: push in dockerhub registry
+    strategy:
+      matrix:
+        arch:
+          - amd64
+          - arm64
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: .
+          name: cowsaybin-${{ matrix.arch }}
+
+      - run: | 
+          chmod u+x cowsay
+
+      - run: |
+          pwd
+          ls -alh
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.arch }}
+          tags: |
+            type=schedule,pattern={{date 'YYYYMMDD'}}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME_Karim }}
+          password: ${{ secrets.DOCKERHUB_TOKEN_Karim }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: linux/${{ matrix.arch }}       
 
  
