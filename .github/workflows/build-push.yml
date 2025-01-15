@@ -10,7 +10,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ${{ vars.DOCKERHUB_USERNAME_BILALIS }}cowsay-go
+  IMAGE_NAME: bilalis/cowsaygo
 
 jobs:
   # Build job
