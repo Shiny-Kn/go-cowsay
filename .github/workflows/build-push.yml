@@ -94,9 +94,6 @@ jobs:
           path: .
           name: cowsaybin-${{ matrix.arch }}
 
-      - run: | 
-          chmod u+x cowsay
-
       - run: |
           pwd
           ls -alh
