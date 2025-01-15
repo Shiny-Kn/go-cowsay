@@ -4,9 +4,5 @@ FROM ubuntu:24.04
 COPY bin/cowsay /usr/local/bin/cowsay
 
 
-
-
-
-
 # Commande par défaut
 CMD ["cowsay"]
