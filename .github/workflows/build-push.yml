@@ -80,15 +80,21 @@ jobs:
         name: cowsay-binary
         path: ./bin
 
-    - name: Deploy application on server
-      run: |
-          docker stop cowsay || true
-          docker rm cowsay || true
-          chmod +x ./bin/cowsay
-          nohup ./bin/cowsay 
+    # - name: Deploy application on server
+    #   run: |
+    #       docker stop cowsay || true
+    #       docker rm cowsay || true
+    #       chmod +x ./bin/cowsay
+    #       nohup ./bin/cowsay 
 
           
+    - name: Set execute permissions
+      run: chmod +x ./bin/cowsay
 
+    - name: Run the binary directly
+      run: |
+        echo "Running cowsay binary..."
+        ./bin/cowsay "Hello from GitHub Actions!"
           
 
  
