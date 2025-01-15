@@ -50,25 +50,25 @@ jobs:
         path: bin/
         name: cowsaybin-${{ matrix.arch }}
 
-# Deploy job
-  deploy:
-    runs-on: self-hosted  # Utiliser un runner auto-hébergé
+# # Deploy job
+#   deploy:
+#     runs-on: self-hosted  # Utiliser un runner auto-hébergé
 
-    needs: build  # Le déploiement dépend du succès de l'étape build
+#     needs: build  # Le déploiement dépend du succès de l'étape build
 
-    steps:
-    - name: Download binary artifact
-      uses: actions/download-artifact@v3
-      with:
-        name: cowsay-binary
-        path: ./bin
+#     steps:
+#     - name: Download binary artifact
+#       uses: actions/download-artifact@v3
+#       with:
+#         name: cowsay-binary
+#         path: ./bin
 
-    - name: Deploy application on server
-      run: |
-          docker stop cowsay || true
-          docker rm cowsay || true
-          chmod +x ./bin/cowsay
-          nohup ./bin/cowsay &
+#     - name: Deploy application on server
+#       run: |
+#           docker stop cowsay || true
+#           docker rm cowsay || true
+#           chmod +x ./bin/cowsay
+#           nohup ./bin/cowsay &
           
           
   push-docker:
