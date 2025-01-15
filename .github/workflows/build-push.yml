@@ -10,7 +10,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: bilalis/cowsaygo
+  IMAGE_NAME: bilalis/cowsay-go
 
 jobs:
   # Build job
@@ -50,7 +50,7 @@ jobs:
       uses: docker/login-action@v3
       with:
        username: ${{ vars.DOCKERHUB_USERNAME_BILALIS }}
-       password: ${{ secrets.BILALIS }}
+       password: ${{ secrets.DOCKERHUB_TOKEN_BILALIS }}
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v6
