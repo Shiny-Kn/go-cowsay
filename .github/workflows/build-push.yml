@@ -30,29 +30,18 @@ jobs:
           main.go
           go.sum
 
-    - name: Docker meta
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}    
-    
 
     - name: Build the cowsay
       uses: actions/setup-go@v5
       with:
-        go-version: '1.23.4'
-        check-latest: true
+        go-version: '>=1.23'
+
+    - run: go version
+        
     - run: go build -o bin/cowsay main.go
       env:
         GOARCH: ${{ matrix.arch }}
 
-
-
-    - name: Save binary as artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: cowsay-binary
-        path: bin/cowsay
 
     - name: Upload static files as artifact
       id: deployment
