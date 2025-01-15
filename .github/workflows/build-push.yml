@@ -12,7 +12,6 @@ env:
   IMAGE_NAME: kareemdev2/cowsaygo
 
 jobs:
-  # Build job
   build:
     name: build go code into binary
     strategy:
@@ -88,7 +87,6 @@ jobs:
           nohup ./bin/cowsay &
           
           
-# Docker job
    push-docker:
     name: push in dockerhub registry
     strategy:
