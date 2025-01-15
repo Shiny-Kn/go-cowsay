@@ -1,5 +1,5 @@
 ---
-  name: Build GO & Docker push
+  name: Build GO & Docker deploy
       
   on:
     workflow_dispatch:
