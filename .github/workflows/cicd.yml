@@ -46,18 +46,18 @@ jobs:
           path: bin/
           name: cowsaybin-${{ matrix.arch }}
   
-  # deploy:
-  #   name: deploy on my self hosted
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/download-artifact@v4
-  #       with:
-  #         path: .
-  #         name: cowsaybin
-  #     - run: | 
-  #         chmod u+x cowsay
-  #         ./cowsay
+  deploy:
+     name: deploy on my self hosted
+     needs: build
+     runs-on: ubuntu-latest
+     steps:
+       - uses: actions/download-artifact@v4
+         with:
+           path: .
+           name: cowsaybin
+       - run: | 
+           chmod u+x cowsay
+           ./cowsay
   
   push-docker:
     name: push in dockerhub registry
