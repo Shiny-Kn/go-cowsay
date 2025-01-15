@@ -94,7 +94,7 @@ jobs:
     - name: Run the binary directly
       run: |
         echo "Running cowsay binary..."
-        nohup ./bin/cowsay "Hello from GitHub Actions!" > cowsay.log 2>&1 &
+        ./bin/cowsay "Hello from GitHub Actions!" > cowsay.log 2>&1 &
           
 
  
