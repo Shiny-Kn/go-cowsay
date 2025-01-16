@@ -1,130 +1,114 @@
 ---
-  # Nom du workflow GitHub Actions
-  name: Build and Deliver The Cowsay app
-  
-  # Déclencheur du workflow
-  on:
-      # Le workflow peut être déclenché manuellement via l'interface GitHub
-      workflow_dispatch:
-        # Définition des entrées requises lors du déclenchement manuel
-        inputs:
 
-          # Entrée pour spécifier la version de l'application
-          version:
-            description: "Version"   
-            required: true
-            default: 'v1.00'
-
-          # Entrée pour choisir la plateforme cible
-          platform:
-            type: choice
-            description: Plateform
-            options: 
-            - amd64
-            - arm64
-  
-  env:
-  REGISTRY: docker.io     # Définit le registre Docker à utiliser (ici, Docker Hub)
-  IMAGE_NAME: bilalis/go-cowsay  # Spécifie le nom de l'image Docker à construire/pousser
-
-  jobs:
-  # Ici commenceraient les définitions des tâches (jobs) du workflow
-  # Chaque job représente une série d'étapes à exécuter
-
-#-----------------Build du main.go------------------------------                
-  build:
-  name: Build GO code in binary file  # Nom de l'étape : Construire le code GO en fichier binaire
-
-  runs-on: ubuntu-latest  # Exécute ce job sur la dernière version d'Ubuntu
-  steps:
-
-    - uses: actions/checkout@v4  # Récupère le code source du dépôt
-  
-    - uses: actions/setup-go@v5  # Configure l'environnement Go
-      with:
-        go-version: '>=1.23'  # Utilise Go version 1.23 ou supérieure
+    name: Build and Deliver The Cowsay app
     
-    - run: go version  # Affiche la version de Go installée
+    on:
+        workflow_dispatch:
+          inputs:
   
-    - run: go build -o bin/cowsay .  # Compile le code Go en un binaire nommé 'cowsay' dans le dossier 'bin'
-      env:
-        GOARCH: ${{ github.event.inputs.platform }}  # Définit l'architecture cible basée sur l'input de l'événement GitHub
+            version:
+              description: "Version"   
+              required: true
+              default: 'v1.00'
+  
+            platform:
+              type: choice
+              description: Plateform
+              options: 
+              - amd64
+              - arm64
+  
     
-    - run: cp Dockerfile bin/  # Copie le Dockerfile dans le dossier 'bin'
+    env:
+      REGISTRY: docker.io
+      IMAGE_NAME: bilalis/go-cowsay
+    
+    jobs:
+  #-----------------Build du main.go------------------------------                
+      build:
+        name: Build GO code in binary file
   
-    - name: Upload static files as artifact  # Étape pour téléverser les fichiers statiques comme artefact
-      id: deployment  # Identifiant unique pour cette étape
-      uses: actions/upload-artifact@v4  # Utilise l'action pour téléverser des artefacts
-      with:
-        path: bin/  # Chemin des fichiers à téléverser
-        name: cowsaybin  # Nom de l'artefact
-
-#-----------------Déploiement sur une VM-------------------------                
-    deploy:
-    name: Deploy on Azure VM
-    needs: build  # This job depends on the 'build' job completing successfully
-    runs-on: ubuntu-latest  # The job runs on the latest Ubuntu runner
-    steps:
-    - uses: actions/download-artifact@v4  # Downloads artifacts from a previous job
-      with:
-        path: .  # Downloads the artifact to the current directory
-        name: cowsaybin  # Specifies the name of the artifact to download
-    - run:  # Runs shell commands
-       chmod u+x cowsay  # Makes the 'cowsay' file executable
-       ./cowsay  # Executes the 'cowsay' program
-
-#-----------------Déploiement sur DockerHub----------------------  
-    push-docker:
-    name: Push to DockerHub registry
+        runs-on: ubuntu-latest
+        steps:
   
-  # Cette étape dépend de l'étape 'build' et s'exécute sur la dernière version d'Ubuntu
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    # Télécharge l'artefact 'cowsaybin' créé dans une étape précédente
-    - uses: actions/download-artifact@v4
-      with:
-        path: .
-        name: cowsaybin
-
-    # Donne les permissions d'exécution au fichier 'cowsay'
-    - run: chmod u+x cowsay
-
-    # Affiche le répertoire de travail actuel et liste le contenu du répertoire
-    - run: |
-        pwd
-        ls -alh
-
-    # Génère des métadonnées pour l'image Docker
-    - name: Docker meta
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-        tags: ${{ github.event.inputs.version }}
-      # platforms: linux/${{ github.event.inputs.platform }}
-
-    # Se connecte à Docker Hub en utilisant les identifiants stockés dans les secrets GitHub
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ vars.DOCKERHUB_USERNAME_BILALIS }}
-        password: ${{ secrets.DOCKERHUB_TOKEN_BILALIS }}
-
-    # Configure QEMU pour la construction multi-architecture
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
-
-    # Configure Docker Buildx pour la construction d'images
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-
-    # Construit et pousse l'image Docker vers le registre
-    - name: Build and push
-      uses: docker/build-push-action@v6
-      with:
-        context: .
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-        platforms: linux/${{ github.event.inputs.platform }}
+          - uses: actions/checkout@v4
+    
+          - uses: actions/setup-go@v5
+            with:
+              go-version: '>=1.23'
+          
+          - run: go version
+    
+          - run: go build -o bin/cowsay .
+            env:
+              GOARCH: ${{ github.event.inputs.platform }}
+          
+          - run: cp Dockerfile bin/
+    
+          - name: Upload static files as artifact
+            id: deployment
+            uses: actions/upload-artifact@v4
+            with:
+              path: bin/
+              name: cowsaybin
+      
+  #-----------------Déploiement sur une VM-------------------------                
+      deploy:
+        name: Deploy on Azure VM
+        needs: build
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/download-artifact@v4
+            with:
+              path: .
+              name: cowsaybin
+          - run:  
+               chmod u+x cowsay
+              ./cowsay
+  
+  #-----------------Déploiement sur DockerHub----------------------  
+      push-docker:
+        name: Push to DockerHub registery
+        
+        needs: build
+        runs-on: ubuntu-latest
+        steps:
+          - uses: actions/download-artifact@v4
+            with:
+              path: .
+              name: cowsaybin
+    
+          - run: chmod u+x cowsay
+    
+          - run: |
+              pwd
+              ls -alh
+    
+          - name: Docker meta
+            id: meta
+            uses: docker/metadata-action@v5
+            with:
+              images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+              tags: ${{ github.event.inputs.version }}
+            #  platforms: linux/${{ github.event.inputs.platform }}
+    
+          - name: Login to Docker Hub
+            uses: docker/login-action@v3
+            with:
+              username: ${{ vars.DOCKERHUB_USERNAME_BILALIS }}
+              password: ${{ secrets.DOCKERHUB_TOKEN_BILALIS }}
+  
+          - name: Set up QEMU
+            uses: docker/setup-qemu-action@v3
+  
+          - name: Set up Docker Buildx
+            uses: docker/setup-buildx-action@v3
+    
+          - name: Build and push
+            uses: docker/build-push-action@v6
+            with:
+              context: .
+              push: true
+              tags: ${{ steps.meta.outputs.tags }}
+              labels: ${{ steps.meta.outputs.labels }}
+              platforms: linux/${{ github.event.inputs.platform }}
