@@ -1,13 +1,8 @@
-FROM ubuntu:24.04
+# Utilise l'image Ubuntu comme base
+FROM ubuntu
 
-# Copier le fichier cowsay dans le conteneur
-COPY bin/cowsay /usr/local/bin/cowsay
+# Copie le fichier cowsay dans le répertoire courant du conteneur
+COPY cowsay .
 
-# Rendre le fichier exécutable
-RUN chmod +x /usr/local/bin/cowsay
-
-# Définir le répertoire de travail
-WORKDIR /app
-
-# Commande par défaut
-CMD ["cowsay"]
+# Définit la commande par défaut à exécuter lors du démarrage du conteneur
+ENTRYPOINT ["./cowsay"]
