@@ -1,6 +1,6 @@
 ---
 
-  name: Build and Deliver The Cowsay app
+  name: Build and Deliver The Cowsay Loïc
   
   on:
       workflow_dispatch:
